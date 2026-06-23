@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
@@ -16,7 +16,8 @@ import { FuriganaText } from '@/shared/ui/FuriganaText';
 import { useQuizEngine } from '../../application/hooks/useQuizEngine';
 import { QuizSuccessScreen } from './QuizSuccessScreen';
 
-export const VocabQuizRunner = () => {
+// 1. Extracted internal component that safely consumes useSearchParams
+const QuizContent = () => {
     const engine = useQuizEngine();
     const searchParams = useSearchParams();
 
@@ -179,5 +180,19 @@ export const VocabQuizRunner = () => {
                 )}
             </AnimatePresence>
         </div>
+    );
+};
+
+// 2. Main wrapper enforcing Suspense boundary requirements for static builds
+export const VocabQuizRunner = () => {
+    return (
+        <Suspense fallback={
+            <div className="flex flex-col items-center justify-center min-h-[50vh]">
+                <div className="text-4xl text-accent mb-4 animate-spin">🌸</div>
+                <h2 className="text-xl font-black text-primary animate-pulse tracking-widest uppercase text-sm">Loading Engine Matrix...</h2>
+            </div>
+        }>
+            <QuizContent />
+        </Suspense>
     );
 };
