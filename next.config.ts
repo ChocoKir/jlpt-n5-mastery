@@ -15,6 +15,16 @@ const withPWA = withPWAInit({
 const nextConfig: NextConfig = {
     // 🛠️ FIX: Explicitly silences the Turbopack validation error
     turbopack: {},
+
+    // 🚀 NEW: Rewrite paths for the Kuromoji dictionary
+    async rewrites() {
+        return [
+            {
+                source: '/dict/:path*',
+                destination: 'https://cdn.jsdelivr.net/npm/kuromoji@0.1.2/dict/:path*',
+            },
+        ];
+    },
 };
 
 export default withPWA(nextConfig);

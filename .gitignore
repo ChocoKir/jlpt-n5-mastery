@@ -39,7 +39,7 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
-shared/next-env.d.ts
+next-env.d.ts
 =======
 # Logs
 logs
