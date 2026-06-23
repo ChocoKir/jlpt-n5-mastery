@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '@/shared/lib/firebase/config';
@@ -35,22 +35,28 @@ export const SpeakingQuizRunner = () => {
                 setIsLoading(false);
             }
         };
-        fetchQuestions();
+        void fetchQuestions();
     }, []);
 
     const currentQ = questions[currentIndex];
 
     useEffect(() => {
         if (transcript && !hasAnswered && !isListening && currentQ) {
-            checkAnswer(transcript);
+            void checkAnswer(transcript);
         }
     }, [transcript, hasAnswered, isListening, currentQ]);
 
-    const checkAnswer = async (spokenText: string) => {
+    const checkAnswer = useCallback(async (spokenText: string) => {
         if (!currentQ || hasAnswered) return;
 
         const cleanedSpoken = spokenText.replace(/[。、\s\?？!！]/g, '').trim();
-        const matched = currentQ.acceptableAnswers.some((opt: string) => {
+
+        // Ensure graceful handling of expectedResponse strings or arrays
+        const acceptableList = Array.isArray(currentQ.expectedResponse)
+            ? currentQ.expectedResponse
+            : [currentQ.expectedResponse];
+
+        const matched = acceptableList.some((opt: string) => {
             const cleanedOpt = opt.replace(/[。、\s\?？!！]/g, '').trim();
             return cleanedSpoken === cleanedOpt || cleanedSpoken.includes(cleanedOpt);
         });
@@ -61,9 +67,12 @@ export const SpeakingQuizRunner = () => {
         if (matched) {
             engine.recordCorrect();
         } else {
-            engine.recordWrong({ question: currentQ.englishPhrase, correctAnswer: currentQ.acceptableAnswers[0] });
+            engine.recordWrong({
+                question: currentQ.scenario,
+                correctAnswer: acceptableList[0]
+            });
         }
-    };
+    }, [currentQ, hasAnswered, engine]);
 
     const handleNextQuestion = () => {
         if (currentIndex + 1 >= questions.length) engine.finishSession();
@@ -95,7 +104,7 @@ export const SpeakingQuizRunner = () => {
                 </span>
                 <div className="flex items-center gap-4">
                     <span className="text-indigo-500 font-black tracking-widest uppercase text-sm">Score: {engine.score}</span>
-                    <button onClick={engine.exitEarly} className="text-muted hover:text-red-500 transition-colors">
+                    <button onClick={engine.exitEarly} className="text-muted hover:text-red-500 transition-colors" aria-label="Exit">
                         <LogOut size={20} />
                     </button>
                 </div>
@@ -104,12 +113,15 @@ export const SpeakingQuizRunner = () => {
             <AnimatePresence mode="wait">
                 <motion.div key={currentIndex} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ type: "spring", stiffness: 300, damping: 25 }}>
                     <Card className="p-8 shadow-xl border-t-8 border-indigo-500 mb-6 text-center bg-card/60 backdrop-blur-xl">
-                        <h3 className="text-muted font-bold mb-4 uppercase tracking-widest text-xs border-b border-border/50 pb-2">Translate and speak aloud:</h3>
-                        <h1 className="text-3xl sm:text-4xl text-primary font-black my-8 leading-tight">"{currentQ.englishPhrase}"</h1>
+                        <h3 className="text-muted font-bold mb-2 uppercase tracking-widest text-xs border-b border-border/50 pb-2">Scenario: {currentQ.scenario}</h3>
+                        <h3 className="text-muted font-bold mb-4 uppercase tracking-widest text-[10px]">Translate and speak aloud:</h3>
+                        <h1 className="text-2xl sm:text-3xl text-primary font-black my-6 leading-tight border border-border/40 p-4 rounded-xl bg-background/40">
+                            "{currentQ.prompt}"
+                        </h1>
 
-                        <div className="relative w-32 h-32 mx-auto mb-10">
+                        <div className="relative w-32 h-32 mx-auto mb-10 mt-8">
                             {isListening && <motion.div animate={{ scale: [1, 1.6], opacity: [0.6, 0] }} transition={{ repeat: Infinity, duration: 1.2 }} className="absolute inset-0 bg-red-500 rounded-full" />}
-                            <button onClick={startListening} disabled={isListening || hasAnswered} className={`relative z-10 w-full h-full rounded-full flex items-center justify-center text-5xl shadow-lg border-4 transition-all outline-none ${isListening ? 'bg-red-50 text-red-500 border-red-500' : 'bg-card text-indigo-500 border-border hover:border-indigo-400 hover:bg-indigo-50 hover:scale-105'} ${hasAnswered ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>
+                            <button onClick={startListening} disabled={isListening || hasAnswered} className={`relative z-10 w-full h-full rounded-full flex items-center justify-center text-5xl shadow-lg border-4 transition-all outline-none ${isListening ? 'bg-red-50 text-red-500 border-red-500' : 'bg-card text-indigo-500 border-border hover:border-indigo-400 hover:bg-indigo-50 hover:scale-105'} ${hasAnswered ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`} aria-label="Microphone">
                                 🎙️
                             </button>
                         </div>
@@ -131,8 +143,9 @@ export const SpeakingQuizRunner = () => {
                                     </div>
                                     <div className="bg-background/80 p-4 rounded-xl border border-border/50">
                                         <p className="m-0 text-xs font-black text-muted uppercase tracking-widest mb-1">Expected:</p>
-                                        <p className="m-0 text-lg font-bold text-indigo-600">{currentQ.acceptableAnswers[0]}</p>
-                                        <p className="m-0 text-xs font-bold text-muted mt-1">{currentQ.romajiHint}</p>
+                                        <p className="m-0 text-lg font-bold text-indigo-600">
+                                            {Array.isArray(currentQ.expectedResponse) ? currentQ.expectedResponse[0] : currentQ.expectedResponse}
+                                        </p>
                                     </div>
                                 </div>
                                 {currentQ.explanation && <p className="text-sm font-bold text-muted mt-4 pt-3 border-t border-border/50 text-center">💡 {currentQ.explanation}</p>}
@@ -144,7 +157,11 @@ export const SpeakingQuizRunner = () => {
 
                             {!isCorrect && (
                                 <div className="mt-4">
-                                    <SenseiHelp question={`How do you say: "${currentQ.englishPhrase}" in Japanese?`} wrongAnswer={transcript || "(User did not speak)"} correctAnswer={currentQ.acceptableAnswers[0]} />
+                                    <SenseiHelp
+                                        question={`How do you say: "${currentQ.prompt}" in Japanese for scenario: ${currentQ.scenario}?`}
+                                        wrongAnswer={transcript || "(User did not speak)"}
+                                        correctAnswer={Array.isArray(currentQ.expectedResponse) ? currentQ.expectedResponse[0] : currentQ.expectedResponse}
+                                    />
                                 </div>
                             )}
                         </motion.div>

@@ -18,13 +18,12 @@ export class UserProfileService {
     }
 
     static async updateProfile(user: User, data: UserProfileData): Promise<void> {
-        // Update Firebase Auth identity
+        // 1. Update Firebase Auth identity (NO photoURL here)
         await updateProfile(user, {
-            displayName: data.displayName,
-            photoURL: data.avatar
+            displayName: data.displayName
         });
 
-        // Update custom Firestore data
+        // 2. Update custom Firestore data (Base64 avatar goes here!)
         await updateDoc(doc(db, 'users', user.uid), {
             displayName: data.displayName,
             avatar: data.avatar,

@@ -113,10 +113,10 @@ export const AnalyticsDashboard = () => {
                             <span className="text-[10px] font-black text-muted uppercase tracking-widest bg-background px-3 py-1.5 rounded-lg border border-border/50">Score out of 180</span>
                         </div>
 
-                        {/* 🛠️ FIX: Added min-h-[300px] so Recharts knows exactly how tall to be */}
-                        <div className="flex-grow w-full min-h-[300px] h-full -ml-4">
+                        {/* 🛠️ FIX: Recharts explicit sizing constraint */}
+                        <div className="flex-grow w-full relative -ml-4" style={{ minHeight: '300px' }}>
                             {mockHistory.length > 0 ? (
-                                <ResponsiveContainer width="100%" height="100%">
+                                <ResponsiveContainer width="99%" height={300}>
                                     <BarChart data={mockHistory} margin={{ top: 20, right: 10, left: 0, bottom: 0 }}>
                                         <defs>
                                             <linearGradient id="colorScore" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#6366F1" stopOpacity={0.8}/><stop offset="95%" stopColor="#6366F1" stopOpacity={0.2}/></linearGradient>
@@ -130,7 +130,7 @@ export const AnalyticsDashboard = () => {
                                     </BarChart>
                                 </ResponsiveContainer>
                             ) : (
-                                <div className="w-full h-full flex flex-col items-center justify-center text-muted">
+                                <div className="w-full h-full absolute inset-0 flex flex-col items-center justify-center text-muted">
                                     <Target size={48} className="opacity-20 mb-4" />
                                     <p className="font-bold">No Mock Exams completed yet.</p>
                                 </div>
@@ -148,7 +148,25 @@ export const AnalyticsDashboard = () => {
                     </div>
                     <div className="flex justify-center overflow-x-auto pb-4 custom-scrollbar">
                         <div className="min-w-fit pr-4">
-                            <ActivityCalendar data={heatmapData} theme={calendarTheme} showWeekdayLabels={true} colorScheme="dark" labels={{ totalCount: '{{count}} items studied in the last half year' }} blockSize={14} blockMargin={6} fontSize={12} />
+                            {/* 🛠️ FIX: Only render the calendar if data exists to prevent silent crashes */}
+                            {heatmapData && heatmapData.length > 0 ? (
+                                <ActivityCalendar
+                                    data={heatmapData}
+                                    theme={calendarTheme}
+                                    showWeekdayLabels={true}
+                                    colorScheme="dark"
+                                    labels={{ totalCount: '{{count}} items studied in the last half year' }}
+                                    blockSize={14}
+                                    blockMargin={6}
+                                    fontSize={12}
+                                />
+                            ) : (
+                                <div className="flex flex-col items-center justify-center h-[150px] w-full text-muted opacity-60">
+                                    <Flame size={32} className="mb-2" />
+                                    <p className="text-sm font-bold tracking-widest uppercase">No Activity Data Yet</p>
+                                    <p className="text-xs">Complete a quiz to start your streak!</p>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </SpotlightCard>

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useTransitionRouter } from 'next-view-transitions';
 import { useAuth } from '@/features/auth/presentation/hooks/useAuth';
 import { UserProfileService } from '@/features/user/application/services/user-profile.service';
@@ -8,6 +8,8 @@ import { UserProfileData } from '@/features/user/domain/entities/user-profile.en
 import { FirebaseGamificationRepository } from '@/features/gamification/infrastructure/firebase/gamification.repository';
 import { UserStatsProps } from '@/features/gamification/domain/entities/user-stats.entity';
 import { getDueReviews } from '@/features/spaced-repetition/application/services/srs.service';
+
+import Cropper from 'react-easy-crop';
 
 import { SpotlightCard } from '@/shared/ui/SpotlightCard';
 import { Button } from '@/shared/ui/Button';
@@ -27,9 +29,25 @@ export const ProfileDashboard = () => {
     const [isEditing, setIsEditing] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
 
-    const [profile, setProfile] = useState<UserProfileData>({ displayName: '', avatar: '🥷', dailyGoal: 50 });
+    const [profile, setProfile] = useState<UserProfileData>({ displayName: '', avatar: '🥷', dailyGoal: 180 });
     const [stats, setStats] = useState<UserStatsProps | null>(null);
     const [weakWords, setWeakWords] = useState<any[]>([]);
+
+    // Image Cropping States
+    const [imageSrc, setImageSrc] = useState<string | null>(null);
+    const [crop, setCrop] = useState({ x: 0, y: 0 });
+    const [zoom, setZoom] = useState(1);
+    const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
+
+    // Read URL dynamic signal to auto-open edit mode
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('edit') === 'true') {
+                setIsEditing(true);
+            }
+        }
+    }, []);
 
     useEffect(() => {
         if (user === undefined) return;
@@ -52,7 +70,6 @@ export const ProfileDashboard = () => {
                     setStats({ level: 1, xp: 0, currentStreak: 0 } as UserStatsProps);
                 }
 
-                // 🧠 WIRE UP THE WEAKNESS ENGINE
                 const srsItems = await getDueReviews(user.uid);
                 const weakest = srsItems.sort((a, b) => a.easeFactor - b.easeFactor).slice(0, 3);
 
@@ -77,6 +94,63 @@ export const ProfileDashboard = () => {
 
         void loadData();
     }, [user, router]);
+
+    const onCropComplete = useCallback((croppedArea: any, croppedAreaPixels: any) => {
+        setCroppedAreaPixels(croppedAreaPixels);
+    }, []);
+
+    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files.length > 0) {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            reader.addEventListener('load', () => {
+                setImageSrc(reader.result as string);
+            });
+            reader.readAsDataURL(file);
+        }
+    };
+
+    // Fast activation bridge from non-edit layout straight to upload input context
+    const handleAvatarClick = (e: React.MouseEvent) => {
+        if (!isEditing) {
+            e.preventDefault();
+            setIsEditing(true);
+            setTimeout(() => {
+                document.getElementById('avatar-upload-input')?.click();
+            }, 100);
+        }
+    };
+
+    const createCroppedImage = async () => {
+        if (!imageSrc || !croppedAreaPixels) return;
+
+        const image = new Image();
+        image.src = imageSrc;
+        await new Promise((resolve) => (image.onload = resolve));
+
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        canvas.width = 400;
+        canvas.height = 400;
+
+        ctx.drawImage(
+            image,
+            croppedAreaPixels.x,
+            croppedAreaPixels.y,
+            croppedAreaPixels.width,
+            croppedAreaPixels.height,
+            0,
+            0,
+            400,
+            400
+        );
+
+        const base64Image = canvas.toDataURL('image/jpeg');
+        setProfile({ ...profile, avatar: base64Image });
+        setImageSrc(null);
+    };
 
     const handleSave = async () => {
         if (!user) return;
@@ -105,6 +179,7 @@ export const ProfileDashboard = () => {
     }
 
     const currentLevelXP = stats.xp % XP_PER_LEVEL;
+    const isAvatarUrl = profile.avatar.startsWith('data:image') || profile.avatar.startsWith('http');
 
     return (
         <div className="max-w-6xl mx-auto py-10 px-5 animate-in fade-in duration-500 relative z-10">
@@ -112,11 +187,7 @@ export const ProfileDashboard = () => {
             <div className="flex justify-between items-center border-b-2 border-border/50 pb-6 mb-10">
                 <h1 className="text-4xl font-black text-primary m-0 tracking-tight">Scholar Profile</h1>
                 {!isEditing && (
-                    <Button
-                        onClick={handleLogout}
-                        variant="danger"
-                        className="py-3 px-6 text-sm"
-                    >
+                    <Button onClick={handleLogout} variant="danger" className="py-3 px-6 text-sm">
                         Log Out
                     </Button>
                 )}
@@ -124,14 +195,40 @@ export const ProfileDashboard = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-10">
                 {/* PROFILE CARD */}
-                <SpotlightCard className="p-8 flex flex-col items-center text-center shadow-lg border-t-8 border-accent" glowColor="rgba(255, 42, 84, 0.15)">
-                    <div className="w-40 h-40 text-8xl flex items-center justify-center bg-background border-4 border-accent rounded-full mb-8 shadow-inner drop-shadow-md">
-                        {profile.avatar}
+                <SpotlightCard className="p-8 flex flex-col items-center text-center shadow-lg border-t-8 border-accent h-full" glowColor="rgba(255, 42, 84, 0.15)">
+
+                    {/* 🚀 ALWAYS INTERACTIVE HOVER AVATAR */}
+                    <div className="relative w-40 h-40 mb-8 group rounded-full">
+                        <div className="w-full h-full flex items-center justify-center bg-background border-4 border-accent rounded-full shadow-inner drop-shadow-md overflow-hidden text-8xl transition-transform group-hover:scale-[0.98]">
+                            {isAvatarUrl ? (
+                                <img src={profile.avatar} alt="Profile" className="w-full h-full object-cover" />
+                            ) : (
+                                profile.avatar
+                            )}
+                        </div>
+
+                        {/* Hover Overlay - Intercepts interaction gracefully regardless of edit state */}
+                        <label
+                            onClick={handleAvatarClick}
+                            className="absolute inset-0 flex flex-col items-center justify-center bg-background/60 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity rounded-full cursor-pointer z-10 border-4 border-accent/50"
+                        >
+                            <span className="text-3xl drop-shadow-md mb-1">📷</span>
+                            <span className="text-[10px] font-black uppercase tracking-widest text-primary drop-shadow-md">
+                                {isEditing ? "Upload" : "Change"}
+                            </span>
+                            <input
+                                id="avatar-upload-input"
+                                type="file"
+                                accept="image/*"
+                                onChange={handleFileChange}
+                                className="hidden"
+                            />
+                        </label>
                     </div>
 
                     {isEditing ? (
-                        <div className="w-full text-left animate-in fade-in">
-                            <label className="block text-sm font-black text-muted uppercase tracking-wider mb-4">Choose Avatar</label>
+                        <div className="w-full text-left animate-in fade-in flex-grow flex flex-col">
+                            <label className="block text-sm font-black text-muted uppercase tracking-wider mb-4 text-center">Or Choose Character</label>
                             <div className="flex flex-wrap justify-center gap-3 mb-8">
                                 {AVATARS.map(a => (
                                     <button
@@ -146,7 +243,7 @@ export const ProfileDashboard = () => {
                                 ))}
                             </div>
 
-                            <label className="block text-sm font-black text-muted uppercase tracking-wider mt-4">Display Name</label>
+                            <label className="block text-sm font-black text-muted uppercase tracking-wider mt-auto">Display Name</label>
                             <input
                                 type="text"
                                 value={profile.displayName}
@@ -154,8 +251,8 @@ export const ProfileDashboard = () => {
                                 className="w-full mt-2 p-4 rounded-xl border-2 border-border/50 bg-background text-primary focus:border-accent outline-none font-bold text-lg transition-colors"
                             />
 
-                            <div className="flex gap-4 mt-10">
-                                <Button onClick={handleSave} isLoading={isSaving} className="flex-1 py-4 font-black">
+                            <div className="flex gap-4 mt-8">
+                                <Button onClick={handleSave} isLoading={isSaving} className="flex-1 py-4 font-black shadow-[0_0_15px_rgba(255,42,84,0.3)]">
                                     Save Details
                                 </Button>
                                 <Button onClick={() => setIsEditing(false)} variant="secondary" className="flex-1 py-4 font-bold">
@@ -164,18 +261,23 @@ export const ProfileDashboard = () => {
                             </div>
                         </div>
                     ) : (
-                        <div className="w-full flex flex-col h-full animate-in fade-in">
+                        <div className="w-full flex flex-col h-full animate-in fade-in flex-grow">
                             <h2 className="text-3xl font-black text-primary m-0 mb-2">{profile.displayName || 'Aspiring Scholar'}</h2>
                             <p className="text-muted font-bold mb-8">{user?.email}</p>
 
-                            <div className="bg-background rounded-2xl p-5 border border-border/50 mt-2 shadow-inner">
+                            <div className="bg-background rounded-2xl p-5 border border-border/50 mt-2 shadow-inner mb-8">
                                 <span className="text-xs font-black text-muted uppercase tracking-widest block mb-2">Daily Goal Target</span>
                                 <span className="text-3xl font-black text-accent"><AnimatedCounter value={profile.dailyGoal} /> <span className="text-lg text-muted">XP</span></span>
                             </div>
 
-                            <Button onClick={() => setIsEditing(true)} variant="secondary" className="mt-auto pt-4 pb-4 font-bold w-full">
-                                Edit Profile ✏️
-                            </Button>
+                            <div className="mt-auto">
+                                <Button
+                                    onClick={() => setIsEditing(true)}
+                                    className="w-full py-4 font-black shadow-[0_0_15px_rgba(255,42,84,0.3)]"
+                                >
+                                    Edit Profile ✏️
+                                </Button>
+                            </div>
                         </div>
                     )}
                 </SpotlightCard>
@@ -218,6 +320,40 @@ export const ProfileDashboard = () => {
                     </SpotlightCard>
                 </div>
             </div>
+
+            {/* CROPPING MODAL OVERLAY */}
+            {imageSrc && (
+                <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-background/90 backdrop-blur-md p-5 animate-in fade-in">
+                    <div className="relative w-full max-w-md h-96 bg-card rounded-2xl border border-border/50 overflow-hidden mb-6">
+                        <Cropper
+                            image={imageSrc}
+                            crop={crop}
+                            zoom={zoom}
+                            aspect={1}
+                            onCropChange={setCrop}
+                            onZoomChange={setZoom}
+                            onCropComplete={onCropComplete}
+                        />
+                    </div>
+                    <div className="w-full max-w-md bg-card/50 p-4 rounded-xl border border-border/50 mb-6 flex flex-col gap-2">
+                        <span className="text-xs font-black text-muted uppercase tracking-wider">Adjustment Scale</span>
+                        <input
+                            type="range"
+                            value={zoom}
+                            min={1}
+                            max={3}
+                            step={0.1}
+                            aria-label="Zoom"
+                            onChange={(e) => setZoom(Number(e.target.value))}
+                            className="w-full accent-accent bg-background rounded-lg appearance-none h-2"
+                        />
+                    </div>
+                    <div className="flex gap-4 w-full max-w-md">
+                        <Button onClick={createCroppedImage} className="flex-1 py-4 font-black">Crop & Confirm ✂️</Button>
+                        <Button onClick={() => setImageSrc(null)} variant="secondary" className="flex-1 py-4 font-bold">Cancel</Button>
+                    </div>
+                </div>
+            )}
 
             {/* WEAKNESSES */}
             <SpotlightCard className="p-10 border-t-8 border-rose-500 shadow-xl bg-gradient-to-b from-rose-50/50 to-transparent dark:from-rose-900/10 mb-10" glowColor="rgba(244, 63, 94, 0.15)">

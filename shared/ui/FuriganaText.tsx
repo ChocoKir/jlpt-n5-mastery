@@ -4,9 +4,13 @@ import React, { useEffect, useState } from 'react';
 import Kuroshiro from 'kuroshiro';
 import KuromojiAnalyzer from 'kuroshiro-analyzer-kuromoji';
 
-// Global singletons to handle initialization race conditions across multiple components
+// Global singletons for initialization
 let kuroshiroInstance: Kuroshiro | null = null;
 let initPromise: Promise<void> | null = null;
+
+// 🚀 NEW: Global cache to prevent duplicate NLP processing
+// This stores the PROMISE so simultaneous renders share the exact same calculation
+const conversionCache = new Map<string, Promise<string>>();
 
 interface FuriganaTextProps {
     children: string;
@@ -22,7 +26,7 @@ export const FuriganaText = ({ children, className = "" }: FuriganaTextProps) =>
 
         const parseText = async () => {
             try {
-                // Ensure instance and global initialization promise exist
+                // 1. Ensure global dictionary initialization
                 if (!kuroshiroInstance) {
                     kuroshiroInstance = new Kuroshiro();
                     initPromise = kuroshiroInstance.init(
@@ -32,17 +36,23 @@ export const FuriganaText = ({ children, className = "" }: FuriganaTextProps) =>
                     );
                 }
 
-                // Force all instances to wait until the core dictionary is loaded
                 if (initPromise) {
                     await initPromise;
                 }
 
-                // Safe to convert text now
                 if (kuroshiroInstance) {
-                    const result = await kuroshiroInstance.convert(children, {
-                        mode: "furigana",
-                        to: "hiragana"
-                    });
+                    // 2. Check if we are already processing this exact string
+                    if (!conversionCache.has(children)) {
+                        // If not, start the conversion and cache the PROMISE immediately
+                        const convertTask = kuroshiroInstance.convert(children, {
+                            mode: "furigana",
+                            to: "hiragana"
+                        });
+                        conversionCache.set(children, convertTask);
+                    }
+
+                    // 3. Await the cached promise (whether created by this component or another)
+                    const result = await conversionCache.get(children)!;
 
                     if (isMounted) {
                         setHtml(result);

@@ -5,6 +5,8 @@ import { useTransitionRouter } from 'next-view-transitions';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/features/auth/presentation/hooks/useAuth';
 import { FirebaseGamificationRepository } from '@/features/gamification/infrastructure/firebase/gamification.repository';
+import { UserProfileService } from '@/features/user/application/services/user-profile.service';
+import { UserProfileData } from '@/features/user/domain/entities/user-profile.entity';
 
 import { Card } from '@/shared/ui/Card';
 import { Button } from '@/shared/ui/Button';
@@ -16,29 +18,43 @@ export default function DashboardPage() {
     const router = useTransitionRouter();
 
     const [stats, setStats] = useState<any>(null);
+    const [profile, setProfile] = useState<UserProfileData | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         if (!user?.uid) return;
-        const loadStats = async () => {
+
+        const loadDashboardData = async () => {
             try {
+                // Fetch stats and active profile credentials concurrently
                 const repo = new FirebaseGamificationRepository();
-                const userStats = await repo.getUserStats(user.uid);
+                const [userStats, profileData] = await Promise.all([
+                    repo.getUserStats(user.uid),
+                    UserProfileService.getProfile(user.uid)
+                ]);
+
                 if (userStats) {
                     setStats(userStats.toJSON());
                 } else {
                     setStats({ level: 1, xp: 0, currentStreak: 0 });
                 }
+
+                if (profileData) {
+                    setProfile(profileData);
+                }
             } catch (error) {
-                console.error("Failed to load dashboard stats:", error);
+                console.error("Failed to load dashboard sync data:", error);
                 setStats({ level: 1, xp: 0, currentStreak: 0 });
             } finally {
                 setIsLoading(false);
             }
         };
-        // 🛠️ FIX: Added void to handle the floating promise
-        void loadStats();
+
+        void loadDashboardData();
     }, [user?.uid]);
+
+    // Avatar presentation validator (detect emoji block vs cropped Base64 frame)
+    const isAvatarUrl = profile?.avatar && (profile.avatar.startsWith('data:image') || profile.avatar.startsWith('http'));
 
     return (
         <div className="min-h-screen bg-background">
@@ -49,15 +65,42 @@ export default function DashboardPage() {
                     animate={{ opacity: 1, y: 0 }}
                     className="p-8 mb-10 rounded-3xl border-2 border-border/60 bg-card/40 backdrop-blur-3xl shadow-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-6"
                 >
-                    <div>
-                        <h1 className="text-4xl font-black text-primary tracking-tight mb-2">
-                            Welcome back, <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent to-indigo-500">Scholar</span> 🥷
-                        </h1>
-                        <p className="text-muted font-bold tracking-wider uppercase text-xs">
-                            {user?.email}
-                        </p>
+                    <div className="flex items-center gap-5">
+                        {/* 🚀 Dynamic Identity Circle */}
+                        <button
+                            onClick={() => router.push('/dashboard/profile?edit=true')}
+                            className="group relative w-16 h-16 shrink-0 flex items-center justify-center bg-background border-2 border-accent rounded-full shadow-inner overflow-hidden text-3xl transition-transform hover:scale-105 outline-none cursor-pointer"
+                        >
+                            {isAvatarUrl ? (
+                                <img src={profile?.avatar} alt="Identity Frame" className="w-full h-full object-cover group-hover:opacity-40 transition-opacity" />
+                            ) : (
+                                <span className="group-hover:opacity-40 transition-opacity">{profile?.avatar || '🥷'}</span>
+                            )}
+                            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-background/20 backdrop-blur-[2px]">
+                                ✏️
+                            </div>
+                        </button>
+
+                        <div>
+                            <h1 className="text-3xl md:text-4xl font-black text-primary tracking-tight mb-1">
+                                Welcome back, <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent to-indigo-500">{profile?.displayName || 'Scholar'}</span>
+                            </h1>
+
+                            <div className="flex items-center gap-3 mt-1">
+                                <p className="text-muted font-bold tracking-wider uppercase text-[10px] m-0">
+                                    {user?.email}
+                                </p>
+                                <span className="text-border/50 text-[10px]">•</span>
+                                <button
+                                    onClick={() => router.push('/dashboard/profile?edit=true')}
+                                    className="text-[10px] font-black text-accent uppercase tracking-widest hover:text-primary transition-colors outline-none cursor-pointer"
+                                >
+                                    Edit Profile
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                    <Button onClick={() => router.push('/quiz/custom')} className="py-4 px-8 text-base shadow-lg shadow-accent/20">
+                    <Button onClick={() => router.push('/quiz/custom')} className="py-4 px-8 text-base shadow-lg shadow-accent/20 w-full md:w-auto">
                         Custom Training ⚙️
                     </Button>
                 </motion.div>

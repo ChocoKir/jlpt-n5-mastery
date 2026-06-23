@@ -4,7 +4,7 @@ import React from 'react';
 import { useTransitionRouter } from 'next-view-transitions';
 import { motion, Variants } from 'framer-motion';
 import {
-    BookOpen, Headphones, Sparkles, // 🛠️ FIX: Removed unused 'Mic' import
+    BookOpen, Headphones, Sparkles, Mic, // 🚀 ADDED 'Mic'
     Swords, Settings2, WholeWord, Target,
     MessageSquareQuote, TextSelect, Zap, MessageCircle, ScanSearch, FileText
 } from 'lucide-react';
@@ -78,7 +78,8 @@ export default function QuizCenterHub() {
                         <h3 className="text-sm font-black text-muted uppercase tracking-widest mb-4 ml-2 flex items-center gap-2">
                             <Zap size={16} /> Specialized Training
                         </h3>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        {/* 🛠️ FIX: Changed grid-cols-4 to grid-cols-3 or let it wrap naturally with 9 items */}
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                             <motion.div variants={itemVars}><ModuleCard title="Vocab Swipe" icon={<Zap />} onClick={() => router.push('/quiz/vocab-swipe')} color="text-orange-400" glow="rgba(251, 146, 60, 0.2)" /></motion.div>
                             <motion.div variants={itemVars}><ModuleCard title="Kanji Context" icon={<TextSelect />} onClick={() => router.push('/quiz/kanji-context')} color="text-rose-400" glow="rgba(251, 113, 133, 0.2)" /></motion.div>
                             <motion.div variants={itemVars}><ModuleCard title="Syntax Star" icon={<Sparkles />} onClick={() => router.push('/quiz/star')} color="text-yellow-500" glow="rgba(234, 179, 8, 0.2)" /></motion.div>
@@ -87,6 +88,8 @@ export default function QuizCenterHub() {
                             <motion.div variants={itemVars}><ModuleCard title="Synonyms" icon={<WholeWord />} onClick={() => router.push('/quiz/synonyms')} color="text-emerald-500" glow="rgba(16, 185, 129, 0.2)" /></motion.div>
                             <motion.div variants={itemVars}><ModuleCard title="LINE Chat" icon={<MessageCircle />} onClick={() => router.push('/quiz/grammar-chat')} color="text-green-400" glow="rgba(74, 222, 128, 0.2)" /></motion.div>
                             <motion.div variants={itemVars}><ModuleCard title="Spatial Audio" icon={<Headphones />} onClick={() => router.push('/quiz/listening-hotspot')} color="text-cyan-400" glow="rgba(34, 211, 238, 0.2)" /></motion.div>
+                            {/* 🚀 NEW: Speaking Quiz Link */}
+                            <motion.div variants={itemVars}><ModuleCard title="Speaking Drills" icon={<Mic />} onClick={() => router.push('/quiz/speaking')} color="text-pink-500" glow="rgba(236, 72, 153, 0.2)" /></motion.div>
                         </div>
                     </div>
 

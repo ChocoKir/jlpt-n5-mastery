@@ -12,6 +12,7 @@ export const ModuleNav = () => {
         { path: '/dashboard', label: 'Dashboard', icon: '🌸' },
         { path: '/review', label: 'Daily Review', icon: '🧠' },
         { path: '/study', label: 'Study Center', icon: '📚' },
+        { path: '/quiz', label: 'Quiz Center', icon: '⚔️' }, // 🚀 NEW: Quiz Center added
         { path: '/quiz/mock-exam', label: 'The Gauntlet', icon: '⛩️' },
         { path: '/dashboard/analytics', label: 'Analytics', icon: '📊' },
         { path: '/leaderboard', label: 'Leaderboard', icon: '🏆' }
@@ -23,7 +24,8 @@ export const ModuleNav = () => {
         <div className="sticky top-16 z-40 w-full bg-background/80 backdrop-blur-xl border-b border-border/50 shadow-sm overflow-x-auto hide-scrollbar">
             <div className="max-w-7xl mx-auto px-5 flex items-center gap-2 sm:gap-6 min-w-max">
                 {navItems.map((item) => {
-                    const isActive = (item.path === '/dashboard' || item.path === '/study')
+                    // 🛠️ FIX: Added '/quiz' to exact match so it doesn't conflict with '/quiz/mock-exam'
+                    const isActive = (item.path === '/dashboard' || item.path === '/study' || item.path === '/quiz')
                         ? pathname === item.path
                         : pathname?.startsWith(item.path);
 
