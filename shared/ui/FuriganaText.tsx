@@ -19,10 +19,12 @@ export const FuriganaText = ({ children, className = "" }: { children: string, c
         const parseText = async () => {
             try {
                 // 1. If it doesn't exist, create the instance AND the lock
+                // Inside your useEffect
                 if (!kuroshiroInstance) {
                     kuroshiroInstance = new Kuroshiro();
                     initPromise = kuroshiroInstance.init(new KuromojiAnalyzer({
-                        dictPath: "https://cdn.jsdelivr.net/npm/kuromoji@0.1.2/dict"
+                        // Add the slash here!
+                        dictPath: "https://cdn.jsdelivr.net/npm/kuromoji@0.1.2/dict/"
                     }));
                 }
 
