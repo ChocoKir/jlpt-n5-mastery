@@ -4,7 +4,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 // IMPORTANT: Adjust this path based on EXACTLY where this script is saved!
-import { SEED_DATA } from '../shared/data/seed-data';
+import { SEED_DATA } from '@/shared/data/seed-data';
 
 async function runSeeder() {
     console.log('🔥 1. Script started! Initiating JLPT N5 Database Seed...');
