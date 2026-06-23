@@ -1,0 +1,48 @@
+// src/data/kana.ts
+
+export interface KanaCharacter {
+    id: string;
+    character: string;
+    romaji: string;
+    type: 'hiragana' | 'katakana';
+}
+
+export const HIRAGANA: KanaCharacter[] = [
+    { id: 'h_a', character: 'あ', romaji: 'a', type: 'hiragana' }, { id: 'h_i', character: 'い', romaji: 'i', type: 'hiragana' }, { id: 'h_u', character: 'う', romaji: 'u', type: 'hiragana' }, { id: 'h_e', character: 'え', romaji: 'e', type: 'hiragana' }, { id: 'h_o', character: 'お', romaji: 'o', type: 'hiragana' },
+    { id: 'h_ka', character: 'か', romaji: 'ka', type: 'hiragana' }, { id: 'h_ki', character: 'き', romaji: 'ki', type: 'hiragana' }, { id: 'h_ku', character: 'く', romaji: 'ku', type: 'hiragana' }, { id: 'h_ke', character: 'け', romaji: 'ke', type: 'hiragana' }, { id: 'h_ko', character: 'こ', romaji: 'ko', type: 'hiragana' },
+    { id: 'h_sa', character: 'さ', romaji: 'sa', type: 'hiragana' }, { id: 'h_shi', character: 'し', romaji: 'shi', type: 'hiragana' }, { id: 'h_su', character: 'す', romaji: 'su', type: 'hiragana' }, { id: 'h_se', character: 'せ', romaji: 'se', type: 'hiragana' }, { id: 'h_so', character: 'そ', romaji: 'so', type: 'hiragana' },
+    { id: 'h_ta', character: 'た', romaji: 'ta', type: 'hiragana' }, { id: 'h_chi', character: 'ち', romaji: 'chi', type: 'hiragana' }, { id: 'h_tsu', character: 'つ', romaji: 'tsu', type: 'hiragana' }, { id: 'h_te', character: 'て', romaji: 'te', type: 'hiragana' }, { id: 'h_to', character: 'と', romaji: 'to', type: 'hiragana' },
+    { id: 'h_na', character: 'な', romaji: 'na', type: 'hiragana' }, { id: 'h_ni', character: 'に', romaji: 'ni', type: 'hiragana' }, { id: 'h_nu', character: 'ぬ', romaji: 'nu', type: 'hiragana' }, { id: 'h_ne', character: 'ね', romaji: 'ne', type: 'hiragana' }, { id: 'h_no', character: 'の', romaji: 'no', type: 'hiragana' },
+    { id: 'h_ha', character: 'は', romaji: 'ha', type: 'hiragana' }, { id: 'h_hi', character: 'ひ', romaji: 'hi', type: 'hiragana' }, { id: 'h_fu', character: 'ふ', romaji: 'fu', type: 'hiragana' }, { id: 'h_he', character: 'へ', romaji: 'he', type: 'hiragana' }, { id: 'h_ho', character: 'ほ', romaji: 'ho', type: 'hiragana' },
+    { id: 'h_ma', character: 'ま', romaji: 'ma', type: 'hiragana' }, { id: 'h_mi', character: 'み', romaji: 'mi', type: 'hiragana' }, { id: 'h_mu', character: 'む', romaji: 'mu', type: 'hiragana' }, { id: 'h_me', character: 'め', romaji: 'me', type: 'hiragana' }, { id: 'h_mo', character: 'も', romaji: 'mo', type: 'hiragana' },
+    { id: 'h_ya', character: 'や', romaji: 'ya', type: 'hiragana' }, { id: 'h_yu', character: 'ゆ', romaji: 'yu', type: 'hiragana' }, { id: 'h_yo', character: 'よ', romaji: 'yo', type: 'hiragana' },
+    { id: 'h_ra', character: 'ら', romaji: 'ra', type: 'hiragana' }, { id: 'h_ri', character: 'り', romaji: 'ri', type: 'hiragana' }, { id: 'h_ru', character: 'る', romaji: 'ru', type: 'hiragana' }, { id: 'h_re', character: 'れ', romaji: 're', type: 'hiragana' }, { id: 'h_ro', character: 'ろ', romaji: 'ro', type: 'hiragana' },
+    { id: 'h_wa', character: 'わ', romaji: 'wa', type: 'hiragana' }, { id: 'h_wo', character: 'を', romaji: 'wo', type: 'hiragana' },
+    { id: 'h_n', character: 'ん', romaji: 'n', type: 'hiragana' },// --- HIRAGANA DAKUTEN (Double Dots) & HANDAKUTEN (Circles) ---
+    { id: 'h_ga', character: 'が', romaji: 'ga', type: 'hiragana' }, { id: 'h_gi', character: 'ぎ', romaji: 'gi', type: 'hiragana' }, { id: 'h_gu', character: 'ぐ', romaji: 'gu', type: 'hiragana' }, { id: 'h_ge', character: 'げ', romaji: 'ge', type: 'hiragana' }, { id: 'h_go', character: 'ご', romaji: 'go', type: 'hiragana' },
+    { id: 'h_za', character: 'ざ', romaji: 'za', type: 'hiragana' }, { id: 'h_ji', character: 'じ', romaji: 'ji', type: 'hiragana' }, { id: 'h_zu', character: 'ず', romaji: 'zu', type: 'hiragana' }, { id: 'h_ze', character: 'ぜ', romaji: 'ze', type: 'hiragana' }, { id: 'h_zo', character: 'ぞ', romaji: 'zo', type: 'hiragana' },
+    { id: 'h_da', character: 'だ', romaji: 'da', type: 'hiragana' }, { id: 'h_dji', character: 'ぢ', romaji: 'ji', type: 'hiragana' }, { id: 'h_dzu', character: 'づ', romaji: 'zu', type: 'hiragana' }, { id: 'h_de', character: 'で', romaji: 'de', type: 'hiragana' }, { id: 'h_do', character: 'ど', romaji: 'do', type: 'hiragana' },
+    { id: 'h_ba', character: 'ば', romaji: 'ba', type: 'hiragana' }, { id: 'h_bi', character: 'び', romaji: 'bi', type: 'hiragana' }, { id: 'h_bu', character: 'ぶ', romaji: 'bu', type: 'hiragana' }, { id: 'h_be', character: 'べ', romaji: 'be', type: 'hiragana' }, { id: 'h_bo', character: 'ぼ', romaji: 'bo', type: 'hiragana' },
+    { id: 'h_pa', character: 'ぱ', romaji: 'pa', type: 'hiragana' }, { id: 'h_pi', character: 'ぴ', romaji: 'pi', type: 'hiragana' }, { id: 'h_pu', character: 'ぷ', romaji: 'pu', type: 'hiragana' }, { id: 'h_pe', character: 'ぺ', romaji: 'pe', type: 'hiragana' }, { id: 'h_po', character: 'ぽ', romaji: 'po', type: 'hiragana' }
+];
+
+export const KATAKANA: KanaCharacter[] = [
+    { id: 'k_a', character: 'ア', romaji: 'a', type: 'katakana' }, { id: 'k_i', character: 'イ', romaji: 'i', type: 'katakana' }, { id: 'k_u', character: 'ウ', romaji: 'u', type: 'katakana' }, { id: 'k_e', character: 'エ', romaji: 'e', type: 'katakana' }, { id: 'k_o', character: 'オ', romaji: 'o', type: 'katakana' },
+    { id: 'k_ka', character: 'カ', romaji: 'ka', type: 'katakana' }, { id: 'k_ki', character: 'キ', romaji: 'ki', type: 'katakana' }, { id: 'k_ku', character: 'ク', romaji: 'ku', type: 'katakana' }, { id: 'k_ke', character: 'ケ', romaji: 'ke', type: 'katakana' }, { id: 'k_ko', character: 'コ', romaji: 'ko', type: 'katakana' },
+    { id: 'k_sa', character: 'サ', romaji: 'sa', type: 'katakana' }, { id: 'k_shi', character: 'シ', romaji: 'shi', type: 'katakana' }, { id: 'k_su', character: 'ス', romaji: 'su', type: 'katakana' }, { id: 'k_se', character: 'セ', romaji: 'se', type: 'katakana' }, { id: 'k_so', character: 'ソ', romaji: 'so', type: 'katakana' },
+    { id: 'k_ta', character: 'タ', romaji: 'ta', type: 'katakana' }, { id: 'k_chi', character: 'チ', romaji: 'chi', type: 'katakana' }, { id: 'k_tsu', character: 'ツ', romaji: 'tsu', type: 'katakana' }, { id: 'k_te', character: 'テ', romaji: 'te', type: 'katakana' }, { id: 'k_to', character: 'ト', romaji: 'to', type: 'katakana' },
+    { id: 'k_na', character: 'ナ', romaji: 'na', type: 'katakana' }, { id: 'k_ni', character: 'ニ', romaji: 'ni', type: 'katakana' }, { id: 'k_nu', character: 'ヌ', romaji: 'nu', type: 'katakana' }, { id: 'k_ne', character: 'ネ', romaji: 'ne', type: 'katakana' }, { id: 'k_no', character: 'ノ', romaji: 'no', type: 'katakana' },
+    { id: 'k_ha', character: 'ハ', romaji: 'ha', type: 'katakana' }, { id: 'k_hi', character: 'ヒ', romaji: 'hi', type: 'katakana' }, { id: 'k_fu', character: 'フ', romaji: 'fu', type: 'katakana' }, { id: 'k_he', character: 'ヘ', romaji: 'he', type: 'katakana' }, { id: 'k_ho', character: 'ホ', romaji: 'ho', type: 'katakana' },
+    { id: 'k_ma', character: 'マ', romaji: 'ma', type: 'katakana' }, { id: 'k_mi', character: 'ミ', romaji: 'mi', type: 'katakana' }, { id: 'k_mu', character: 'ム', romaji: 'mu', type: 'katakana' }, { id: 'k_me', character: 'メ', romaji: 'me', type: 'katakana' }, { id: 'k_mo', character: 'モ', romaji: 'mo', type: 'katakana' },
+    { id: 'k_ya', character: 'ヤ', romaji: 'ya', type: 'katakana' }, { id: 'k_yu', character: 'ユ', romaji: 'yu', type: 'katakana' }, { id: 'k_yo', character: 'ヨ', romaji: 'yo', type: 'katakana' },
+    { id: 'k_ra', character: 'ラ', romaji: 'ra', type: 'katakana' }, { id: 'k_ri', character: 'リ', romaji: 'ri', type: 'katakana' }, { id: 'k_ru', character: 'ル', romaji: 'ru', type: 'katakana' }, { id: 'k_re', character: 'レ', romaji: 're', type: 'katakana' }, { id: 'k_ro', character: 'ロ', romaji: 'ro', type: 'katakana' },
+    { id: 'k_wa', character: 'ワ', romaji: 'wa', type: 'katakana' }, { id: 'k_wo', character: 'ヲ', romaji: 'wo', type: 'katakana' },
+    { id: 'k_n', character: 'ン', romaji: 'n', type: 'katakana' },// --- KATAKANA DAKUTEN & HANDAKUTEN ---
+    { id: 'k_ga', character: 'ガ', romaji: 'ga', type: 'katakana' }, { id: 'k_gi', character: 'ギ', romaji: 'gi', type: 'katakana' }, { id: 'k_gu', character: 'グ', romaji: 'gu', type: 'katakana' }, { id: 'k_ge', character: 'ゲ', romaji: 'ge', type: 'katakana' }, { id: 'k_go', character: 'ゴ', romaji: 'go', type: 'katakana' },
+    { id: 'k_za', character: 'ザ', romaji: 'za', type: 'katakana' }, { id: 'k_ji', character: 'ジ', romaji: 'ji', type: 'katakana' }, { id: 'k_zu', character: 'ズ', romaji: 'zu', type: 'katakana' }, { id: 'k_ze', character: 'ゼ', romaji: 'ze', type: 'katakana' }, { id: 'k_zo', character: 'ゾ', romaji: 'zo', type: 'katakana' },
+    { id: 'k_da', character: 'ダ', romaji: 'da', type: 'katakana' }, { id: 'k_dji', character: 'ヂ', romaji: 'ji', type: 'katakana' }, { id: 'k_dzu', character: 'ヅ', romaji: 'zu', type: 'katakana' }, { id: 'k_de', character: 'デ', romaji: 'de', type: 'katakana' }, { id: 'k_do', character: 'ド', romaji: 'do', type: 'katakana' },
+    { id: 'k_ba', character: 'バ', romaji: 'ba', type: 'katakana' }, { id: 'k_bi', character: 'ビ', romaji: 'bi', type: 'katakana' }, { id: 'k_bu', character: 'ブ', romaji: 'bu', type: 'katakana' }, { id: 'k_be', character: 'ベ', romaji: 'be', type: 'katakana' }, { id: 'k_bo', character: 'ボ', romaji: 'bo', type: 'katakana' },
+    { id: 'k_pa', character: 'パ', romaji: 'pa', type: 'katakana' }, { id: 'k_pi', character: 'ピ', romaji: 'pi', type: 'katakana' }, { id: 'k_pu', character: 'プ', romaji: 'pu', type: 'katakana' }, { id: 'k_pe', character: 'ペ', romaji: 'pe', type: 'katakana' }, { id: 'k_po', character: 'ポ', romaji: 'po', type: 'katakana' }
+];
+
+export const ALL_KANA = [...HIRAGANA, ...KATAKANA];

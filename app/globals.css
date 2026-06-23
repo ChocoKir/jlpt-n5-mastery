@@ -1,0 +1,169 @@
+@import "tailwindcss";
+
+/* 1. Tell Tailwind v4 to scan your custom FSD architecture */
+@source "../app";
+@source "../features";
+@source "../shared";
+
+/* 2. Map your CSS variables to Tailwind v4 utility classes */
+@theme {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --radius: var(--radius);
+
+  --font-inter: var(--font-inter);
+  --font-noto-jp: var(--font-noto-jp);
+}
+
+/* 3. The Premium Light/Dark Themes */
+@layer base {
+  :root {
+    /* ☀️ TOKYO MINIMAL LIGHT MODE */
+    --background: 210 20% 98%;
+    --foreground: 222 47% 11%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    --primary: 222 47% 11%;
+    --primary-foreground: 210 20% 98%;
+
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222 47% 11%;
+
+    /* 🛠️ FIX: Swapped! --muted is now the dark gray text color */
+    --muted: 215 16% 47%;
+    --muted-foreground: 214 32% 96%;
+
+    --accent: 349 100% 58%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 20% 98%;
+
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 349 100% 58%;
+
+    --radius: 1rem;
+  }
+
+  .dark {
+    /* 🌙 TRUE OLED BLACK DARK MODE */
+    --background: 0 0% 2%;
+    --foreground: 0 0% 98%;
+
+    --card: 0 0% 4%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 0 0% 4%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 0 0% 98%;
+    --primary-foreground: 240 5.9% 10%;
+
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+
+    /* 🛠️ FIX: Swapped! --muted is now the light gray text color */
+    --muted: 215 20% 65%;
+    --muted-foreground: 240 3.7% 15.9%;
+
+    --accent: 349 100% 58%;
+    --accent-foreground: 0 0% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 349 100% 58%;
+  }
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-inter), var(--font-noto-jp), sans-serif;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+}
+
+/* ==========================================
+  GLOBAL UI OVERRIDES & SCROLLBARS
+  ========================================== */
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-muted);
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.font-japanese {
+  font-family: var(--font-noto-jp), sans-serif;
+  line-height: 1.4;
+}
+
+/* ==========================================
+  ANIMATIONS & EFFECTS
+  ========================================== */
+@keyframes mesh-movement {
+  0% { background-position: 0% 0%; }
+  50% { background-position: 100% 100%; }
+  100% { background-position: 0% 0%; }
+}
+
+.mesh-bg {
+  background-image:
+          radial-gradient(circle at top left, rgba(255, 42, 84, 0.03) 0%, transparent 40%),
+          radial-gradient(circle at bottom right, rgba(99, 102, 241, 0.03) 0%, transparent 40%);
+  background-size: 200% 200%;
+  background-attachment: fixed;
+  animation: mesh-movement 20s ease-in-out infinite alternate;
+}
+
+.perspective-1000 { perspective: 1000px; }
+.transform-style-3d { transform-style: preserve-3d; }
+.backface-hidden { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.rotate-y-180 { transform: rotateY(180deg); }
