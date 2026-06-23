@@ -2,14 +2,18 @@
 
 import React, { useEffect, useState } from 'react';
 import Kuroshiro from 'kuroshiro';
-// @ts-ignore
 import KuromojiAnalyzer from 'kuroshiro-analyzer-kuromoji';
 
-// 🛠️ THE FIX: Add a global Promise lock
-let kuroshiroInstance: any = null;
+// Global singletons to handle initialization race conditions across multiple components
+let kuroshiroInstance: Kuroshiro | null = null;
 let initPromise: Promise<void> | null = null;
 
-export const FuriganaText = ({ children, className = "" }: { children: string, className?: string }) => {
+interface FuriganaTextProps {
+    children: string;
+    className?: string;
+}
+
+export const FuriganaText = ({ children, className = "" }: FuriganaTextProps) => {
     const [html, setHtml] = useState<string>(children);
     const [isParsing, setIsParsing] = useState(true);
 
@@ -18,40 +22,46 @@ export const FuriganaText = ({ children, className = "" }: { children: string, c
 
         const parseText = async () => {
             try {
-                // 1. If it doesn't exist, create the instance AND the lock
-                // Inside your useEffect
+                // Ensure instance and global initialization promise exist
                 if (!kuroshiroInstance) {
                     kuroshiroInstance = new Kuroshiro();
-                    initPromise = kuroshiroInstance.init(new KuromojiAnalyzer({
-                        // Add the slash here!
-                        dictPath: "https://cdn.jsdelivr.net/npm/kuromoji@0.1.2/dict/"
-                    }));
+                    initPromise = kuroshiroInstance.init(
+                        new KuromojiAnalyzer({
+                            dictPath: "https://cdn.jsdelivr.net/npm/kuromoji@0.1.2/dict/"
+                        })
+                    );
                 }
 
-                // 2. ALL components must wait for the global lock to resolve
-                // before trying to translate anything.
+                // Force all instances to wait until the core dictionary is loaded
                 if (initPromise) {
                     await initPromise;
                 }
 
-                // 3. Now it is 100% safe to parse
-                const result = await kuroshiroInstance.convert(children, {
-                    mode: "furigana",
-                    to: "hiragana"
-                });
+                // Safe to convert text now
+                if (kuroshiroInstance) {
+                    const result = await kuroshiroInstance.convert(children, {
+                        mode: "furigana",
+                        to: "hiragana"
+                    });
 
-                if (isMounted) {
-                    setHtml(result);
-                    setIsParsing(false);
+                    if (isMounted) {
+                        setHtml(result);
+                        setIsParsing(false);
+                    }
                 }
             } catch (error) {
                 console.error("NLP Parse Error:", error);
-                if (isMounted) setIsParsing(false);
+                if (isMounted) {
+                    setIsParsing(false);
+                }
             }
         };
 
         void parseText();
-        return () => { isMounted = false; };
+
+        return () => {
+            isMounted = false;
+        };
     }, [children]);
 
     return (
