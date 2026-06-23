@@ -4,7 +4,7 @@ import './globals.css';
 
 import { AuthProvider } from '@/features/auth/presentation/providers/AuthProvider';
 import { GlobalHeader } from '@/shared/layout/GlobalHeader';
-import { ModuleNav } from '@/shared/layout/ModuleNav'; // 👈 IMPORTED MODULE NAV
+import { ModuleNav } from '@/shared/layout/ModuleNav';
 import { CommandPalette } from '@/shared/ui/CommandPalette';
 import { PageTransition } from '@/shared/layout/PageTransition';
 import { Toaster } from 'sonner';
@@ -12,6 +12,8 @@ import { Toaster } from 'sonner';
 import { SmoothScroller } from '@/shared/layout/SmoothScroller';
 import { Provider as WrapBalancerProvider } from 'react-wrap-balancer';
 import { ViewTransitions } from 'next-view-transitions';
+import { SpeedInsights } from '@vercel/speed-insights/next';
+import { Analytics } from '@vercel/analytics/react'; // 🚀 Import Vercel Analytics
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 const notoSansJP = Noto_Sans_JP({ subsets: ['latin'], weight: ['400', '700', '900'], variable: '--font-noto-jp' });
@@ -38,7 +40,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
                 <WrapBalancerProvider>
                     <SmoothScroller>
                         <GlobalHeader />
-                        <ModuleNav /> {/* 👈 RENDERED MODULE NAV */}
+                        <ModuleNav />
 
                         <main className="flex-grow pt-8 pb-12 relative z-10 w-full overflow-hidden">
                             <PageTransition>
@@ -47,6 +49,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
                         </main>
 
                         <CommandPalette />
+
+                        {/* 🚀 RENDERED VERCEL ANALYTICS & SPEED INSIGHTS */}
+                        <Analytics />
+                        <SpeedInsights />
 
                         <Toaster
                             theme="dark"
