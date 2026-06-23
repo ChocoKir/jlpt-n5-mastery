@@ -1,4 +1,4 @@
-declare module 'react-calendar-heatmap' {
+git declare module 'react-calendar-heatmap' {
     import * as React from 'react';
     export interface Props {
         values: any[];
