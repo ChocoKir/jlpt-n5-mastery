@@ -16,11 +16,14 @@ const nextConfig: NextConfig = {
     // 🛠️ FIX: Explicitly silences the Turbopack validation error
     turbopack: {},
 
-    // 🚀 NEW: Rewrite paths for the Kuromoji dictionary
+    // 🚀 NEW: Proxy rule to catch and redirect the incorrectly mangled CDN paths
     async rewrites() {
         return [
             {
-                source: '/dict/:path*',
+                // This matches the exact path the browser is requesting
+                // (e.g., https://jlpt-n5-mastery.vercel.app/cdn.jsdelivr.net/...)
+                source: '/cdn.jsdelivr.net/npm/kuromoji@0.1.2/dict/:path*',
+                // And forwards it to the actual CDN source
                 destination: 'https://cdn.jsdelivr.net/npm/kuromoji@0.1.2/dict/:path*',
             },
         ];
