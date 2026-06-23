@@ -12,6 +12,9 @@ import {
     Search, ShieldAlert, Sun, Moon, Menu, X
 } from 'lucide-react';
 
+// 🛠️ Import your PWA Install Button
+import { PWAInstallButton } from '@/shared/ui/PWAInstallButton';
+
 export const GlobalHeader = () => {
     const { user } = useAuth();
     const pathname = usePathname();
@@ -74,9 +77,17 @@ export const GlobalHeader = () => {
             <div className="max-w-7xl mx-auto px-5 h-16 flex items-center justify-between">
 
                 {/* Logo & Branding */}
-                <Link href="/dashboard" className="flex items-center gap-2 outline-none group">
-                    <motion.div whileHover={{ rotate: -15, scale: 1.1 }} className="text-2xl drop-shadow-md">
-                        🌸
+                <Link href="/dashboard" className="flex items-center gap-2.5 outline-none group">
+                    {/* 🌸 UPDATED: Replaced emoji with optimized transparent PNG asset */}
+                    <motion.div
+                        whileHover={{ rotate: -12, scale: 1.1 }}
+                        className="flex items-center justify-center drop-shadow-sm"
+                    >
+                        <img
+                            src="/icon-512x512.png"
+                            alt="Nihongo N5 Logo"
+                            className="w-8 h-8 object-contain select-none"
+                        />
                     </motion.div>
                     <span className="text-xl font-black text-primary tracking-tight group-hover:text-accent transition-colors">
                         Nihongo <span className="text-accent">N5</span>
@@ -121,6 +132,11 @@ export const GlobalHeader = () => {
                             </Link>
                         </motion.div>
                     )}
+
+                    {/* 🛠️ Desktop PWA Installation Button */}
+                    <div className="hidden md:block">
+                        <PWAInstallButton />
+                    </div>
 
                     <motion.button
                         whileHover={{ scale: 1.1, rotate: 15 }}
@@ -170,6 +186,11 @@ export const GlobalHeader = () => {
                             <div className="h-px bg-border/50 my-2"></div>
 
                             <MobileNavLink href="/dashboard/profile" icon={<span className="text-xl leading-none">{navAvatar ? <img src={navAvatar} className="w-5 h-5 rounded-full" alt="avatar"/> : '🥷'}</span>} label="Profile Settings" current={pathname} />
+
+                            {/* 🛠️ Mobile PWA Installation Button inside dropdown menu */}
+                            <div className="w-full flex justify-stretch mt-1">
+                                <PWAInstallButton />
+                            </div>
 
                             <div className="flex justify-between items-center px-4 py-3 border border-border/50 rounded-xl mt-2">
                                 <span className="font-bold text-sm text-primary">Theme Options</span>

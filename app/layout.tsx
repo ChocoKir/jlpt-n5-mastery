@@ -13,7 +13,10 @@ import { SmoothScroller } from '@/shared/layout/SmoothScroller';
 import { Provider as WrapBalancerProvider } from 'react-wrap-balancer';
 import { ViewTransitions } from 'next-view-transitions';
 import { SpeedInsights } from '@vercel/speed-insights/next';
-import { Analytics } from '@vercel/analytics/react'; // 🚀 Import Vercel Analytics
+import { Analytics } from '@vercel/analytics/react';
+
+// 🌸 IMPORT THE UPDATED BACKGROUND COMPONENT
+import { WebGLBackground } from '@/shared/ui/WebGLBackground';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 const notoSansJP = Noto_Sans_JP({ subsets: ['latin'], weight: ['400', '700', '900'], variable: '--font-noto-jp' });
@@ -36,12 +39,17 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <ViewTransitions>
             <html lang="en" className={`${inter.variable} ${notoSansJP.variable}`}>
             <body className="font-sans antialiased min-h-screen flex flex-col mesh-bg relative selection:bg-accent/30 selection:text-accent">
+
+            {/* 🌌 PERSISTENT 3D BACKGROUND (Sits beautifully behind all content layers) */}
+            <WebGLBackground />
+
             <AuthProvider>
                 <WrapBalancerProvider>
                     <SmoothScroller>
                         <GlobalHeader />
                         <ModuleNav />
 
+                        {/* main section has z-10 so it cleanly scrolls over the background */}
                         <main className="flex-grow pt-8 pb-12 relative z-10 w-full overflow-hidden">
                             <PageTransition>
                                 {children}

@@ -57,9 +57,8 @@ export default function DashboardPage() {
     const isAvatarUrl = profile?.avatar && (profile.avatar.startsWith('data:image') || profile.avatar.startsWith('http'));
 
     return (
-        <div className="min-h-screen bg-background">
-            <div className="max-w-6xl mx-auto py-10 px-5">
-                {/* Premium Frosted Glass Greeting */}
+        <div className="min-h-screen bg-transparent p-8">
+            <div className="bg-card/70 backdrop-blur-md p-6 rounded-2xl border border-border">                {/* Premium Frosted Glass Greeting */}
                 <motion.div
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}

@@ -35,34 +35,36 @@
 /* 3. The Premium Light/Dark Themes */
 @layer base {
   :root {
-    /* ☀️ TOKYO MINIMAL LIGHT MODE */
-    --background: 210 20% 98%;
-    --foreground: 222 47% 11%;
+    /* 🌸 JAPANESE WASHI CREAM LIGHT MODE */
+    /* Changed from 210 20% 98% (bright white) to warm cream */
+    --background: 30 31% 94%;
+    /* Changed foreground from cold blue-black to soft charcoal ink */
+    --foreground: 24 10% 12%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    /* Cards are just a touch brighter than the background paper */
+    --card: 30 30% 97%;
+    --card-foreground: 24 10% 12%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
+    --popover: 30 30% 97%;
+    --popover-foreground: 24 10% 12%;
 
-    --primary: 222 47% 11%;
-    --primary-foreground: 210 20% 98%;
+    --primary: 24 10% 12%;
+    --primary-foreground: 30 31% 94%;
 
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222 47% 11%;
+    --secondary: 30 20% 88%;
+    --secondary-foreground: 24 10% 12%;
 
-    /* 🛠️ FIX: Swapped! --muted is now the dark gray text color */
-    --muted: 215 16% 47%;
-    --muted-foreground: 214 32% 96%;
+    --muted: 25 10% 45%;
+    --muted-foreground: 30 20% 88%;
 
     --accent: 349 100% 58%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 20% 98%;
+    --destructive-foreground: 30 31% 94%;
 
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
+    --border: 30 15% 85%;
+    --input: 30 15% 85%;
     --ring: 349 100% 58%;
 
     --radius: 1rem;
@@ -101,15 +103,22 @@
   }
 }
 
+/* Find this section near line 73 */
 @layer base {
   * {
     border-color: var(--color-border);
   }
-  body {
+
+  /* 🌸 FIX: Target both html and body together */
+  html, body {
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-inter), var(--font-noto-jp), sans-serif;
     transition: background-color 0.3s ease, color 0.3s ease;
+
+    /* Ensures the cream canvas canvas fully matches viewport sizing */
+    min-height: 100vh;
+    min-height: 100dvh;
   }
 }
 
